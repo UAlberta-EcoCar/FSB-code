@@ -1,4 +1,6 @@
-//this sketch simulates a node in the CAN network
+//this sketch logs serial data from our fuel cell controller 
+//to an SD card and parses some values and sends them over CAN-BUS
+
 #include <mcp2515_filter_settings.h>
 #include <can_message_defs.h>
 #include <mcp2515_lib.h>
@@ -53,6 +55,12 @@ void setup() {
 
 CanMessage message;      // Create empty message for sending
 String dataString;
+String subString;
+
+unsigned char index;
+
+unsigned int CAPVOLT;
+unsigned int FC_ERROR;
 
 void loop() 
 {
@@ -73,4 +81,34 @@ void loop()
       digitalWrite(SD_STATUS_LED,LOW);
     }
 
+    //find 2nd csv value
+    index = 0;
+    for(char x = 0; x < 1; x++)
+    { 
+      index = dataString.indexOf(',',index); //find first comma in csv
+    }
+    //retrieve value after 1st comma before 2nd
+    subString = dataString.substring(index,dataString.indexOf(',',index));
+    FC_ERROR = subString.toInt();
+
+    message.id = MESSAGE_FC_ERROR_ID;
+    message.length = MESSAGE_FC_ERROR_LENGTH;
+    message.MESSAGE_FC_ERROR_DATA = FC_ERROR;
+
+    can_send_message(&message);
+    
+    //find 10th csv (CAPVOLT)
+    for(char x = 0; x < 9; x++) // 1 + 9 = 10
+    { 
+      index = dataString.indexOf(',',index); //find first comma in csv
+    }
+    //retrieve value after 10 comma and before 11th comma
+    subString = dataString.substring(index,dataString.indexOf(',',index));
+    CAPVOLT = subString.toInt();
+
+    message.id = MESSAGE_FC_LOGGING_CAPVOLT_CAPCURR_ID;
+    message.length = MESSAGE_FC_LOGGING_CAPVOLT_CAPCURR_LENGTH;
+    message.MESSAGE_FC_LOGGING_CAPVOLT_DATA = CAPVOLT;
+
+    can_send_message(&message);
 }
