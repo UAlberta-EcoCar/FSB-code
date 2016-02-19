@@ -1,10 +1,16 @@
-//this sketch logs serial data from our fuel cell controller 
-//to an SD card and parses some values and sends them over CAN-BUS
+//I quit attempting to can the FCC can bus module to work
+//instead, this sketch will link the CAN-BUS to the FCC usart module
+
+//to do:
+//rumman's new message id system
+//implement two way communication 
+
 
 #include <mcp2515_filter_settings.h>
 #include <can_message_defs.h>
 #include <mcp2515_lib.h>
 #include <mcp2515_settings.h>
+#include "FC_USART_CAN_BRIDGE_LIB.h"
 
 #include <SPI.h>
 #include <SD.h>
@@ -12,6 +18,7 @@
 const int CS = 10;
 const int CAN_STATUS_LED = 2;
 const int SD_STATUS_LED  = 3;
+
 
 void setup() {
   pinMode(CAN_STATUS_LED,OUTPUT);
@@ -62,13 +69,11 @@ String subString;
 
 unsigned char index;
 
-long long CAPVOLT;
-unsigned int FC_ERROR;
+long long val;
 
 void loop() 
 {
     dataString = "";
-
     dataString = Serial.readStringUntil('\n'); //note this has to be single quotes
     //it is a character -> double " is a string
 
@@ -92,45 +97,68 @@ void loop()
     else {      // if the file isn't open, pop up an error:
     }
 
-    /*
+    //run through everything and send over CAN-BUS
 
-    //find 2nd csv value
-    index = 0;
-    for(char x = 0; x < 1; x++)
-    { 
-      index = dataString.indexOf(',',index); //find first comma in csv
-    }
-    //retrieve value after 1st comma before 2nd
-    subString = dataString.substring(index,dataString.indexOf(',',index));
-    FC_ERROR = subString.toInt();
+    //FC_ERROR
+    val = parse_csv(FC_ERROR_CSV,dataString);
 
-    message.id = MESSAGE_FC_ERROR_ID;
-    message.length = MESSAGE_FC_ERROR_LENGTH;
-    message.MESSAGE_FC_ERROR_DATA = FC_ERROR;
+    //FC_STATE
+    val = parse_csv(FC_STATE_CSV,dataString);
 
-    can_send_message(&message);
-    */
+    //PURGE_COUNT
+    val = parse_csv(PURGE_COUNT_CSV,dataString);
+
+    //TIME_BETWEEN_LAST_PURGES
+    val = parse_csv(TIME_BETWEEN_LAST_PURGES_CSV,dataString);
+
+    //ENERGY_SINCE_LAST_PURGE
+    val = parse_csv(ENERGY_SINCE_LAST_PURGE_CSV,dataString);
     
-    //find 10th csv (CAPVOLT)
-    index = 0;
-    for(char x = 1; x < 12; x++) //find 10th csv value
-    { 
-      index = dataString.indexOf(',',index+1); //find first comma in csv
-      //Serial.println(index);
-    }
+    //TOTAL_ENERGY
+    val = parse_csv(TOTAL_ENERGY_CSV,dataString);
 
-    //Serial.println(dataString);
-    subString = "";
-    subString = dataString.substring(index+1,dataString.indexOf(',',index+1));
+    //CHARGE_SINCE_LAST_PURGE
+    val = parse_csv(CHARGE_SINCE_LAST_PURGE_CSV,dataString);
 
-    //Serial.println(subString);
-    CAPVOLT = 0;
-    CAPVOLT = subString.toInt();
-    Serial.println(subString);
-    message.id = 99;
-    message.length = 4;
-    message.data.s32[0] = CAPVOLT;
+    //TOTAL_CHARGE
+    val = parse_csv(TOTAL_CHARGE_CSV,dataString);
 
-    can_send_message(&message);
+    //FCVOLT
+    val = parse_csv(FCVOLT_CSV,dataString);
+
+    //FCCURR
+    val = parse_csv(FCCURR_CSV,dataString);
+
+    //FCTEMP
+    val = parse_csv(FCTEMP_CSV,dataString);
+
+    //FCPRES
+    val = parse_csv(FCPRES_CSV,dataString);
+
+    //CAPVOLT
+    val = parse_csv(CAPVOLT_CSV,dataString);
+
+    //FC_FAN_SPEED
+    val = parse_csv(FC_FAN_SPEED_CSV,dataString);
+
+    //FC_START_RELAY
+    val = parse_csv(FC_START_RELAY_CSV,dataString);
+
+    //FC_RES_RELAY
+    val = parse_csv(FC_RES_RELAY_CSV,dataString);
+
+    //FC_CAP_RELAY
+    val = parse_csv(FC_CAP_RELAY_CSV,dataString);
+
+    //FC_MOTOR_RELAY
+    val = parse_csv(FC_MOTOR_RELAY_CSV,dataString);
+
+    //FC_PURGE_VALVE
+    val = parse_csv(FC_PURGE_VALVE_CSV,dataString);
+
+    //FC_H2_VALVE
+    val = parse_csv(FC_H2_VALVE_CSV,dataString);
+    
+    
     }
 }
