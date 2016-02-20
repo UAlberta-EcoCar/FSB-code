@@ -60,13 +60,17 @@ void loop()
       val = parse_csv(FC_STATE_CSV,dataString);
       send_fc_state((unsigned char)val);
 
+      delay(1);
+
       //PURGE_COUNT
       val = parse_csv(FC_PURGE_COUNT_CSV,dataString);
       send_fc_purge_count((unsigned char)val);
-  
+      
       //TIME_BETWEEN_LAST_PURGES
       val = parse_csv(FC_TIME_BETWEEN_LAST_PURGES_CSV,dataString);
       send_fc_time_between_last_purges((uint32_t) val);
+
+      delay(1);
 
       //ENERGY_SINCE_LAST_PURGE
       val = parse_csv(FC_ENERGY_SINCE_LAST_PURGE_CSV,dataString);
@@ -74,15 +78,18 @@ void loop()
     
       //TOTAL_ENERGY
       val = parse_csv(FC_TOTAL_ENERGY_CSV,dataString);
+      send_fc_total_energy((uint32_t) val);
 
-    //CHARGE_SINCE_LAST_PURGE
-    val = parse_csv(FC_CHARGE_SINCE_LAST_PURGE_CSV,dataString);
+      delay(1);
 
-    //TOTAL_CHARGE
-    val = parse_csv(FC_TOTAL_CHARGE_CSV,dataString);
+      //CHARGE_SINCE_LAST_PURGE
+      val = parse_csv(FC_CHARGE_SINCE_LAST_PURGE_CSV,dataString);
 
-    //FCVOLT
-    val = parse_csv(FCVOLT_CSV,dataString);
+      //TOTAL_CHARGE
+      val = parse_csv(FC_TOTAL_CHARGE_CSV,dataString);
+
+      //FCVOLT
+      val = parse_csv(FCVOLT_CSV,dataString);
 
     //FCCURR
     val = parse_csv(FCCURR_CSV,dataString);
