@@ -1,25 +1,24 @@
 #ifndef FC_USART_CAN_BRIDGE_H
 #define FC_USART_CAN_BRIDGE_H
 
-//#include <arduino.h> //needed for the string definition?
+#include <arduino.h>
 
 //function for parsing csv
-long parse_csv(char val,String& dataString);
+long long parse_csv(char val,String& dataString);
 
 //define all values and the order they are found in csv
-//to do: reorder so that levels are sent first
 
 //fc messages
 #define FC_ERROR_CSV 1
 #define FC_STATE_CSV 2 
 
 //purge data
-#define FC_PURGE_COUNT_CSV 3
-#define FC_TIME_BETWEEN_LAST_PURGES_CSV 4
-#define FC_ENERGY_SINCE_LAST_PURGE_CSV 5
-#define FC_TOTAL_ENERGY_CSV 6 
-#define FC_CHARGE_SINCE_LAST_PURGE_CSV 7
-#define FC_TOTAL_CHARGE_CSV 8
+#define PURGE_COUNT_CSV 3
+#define TIME_BETWEEN_LAST_PURGES_CSV 4
+#define ENERGY_SINCE_LAST_PURGE_CSV 5
+#define TOTAL_ENERGY_CSV 6 
+#define CHARGE_SINCE_LAST_PURGE_CSV 7
+#define TOTAL_CHARGE_CSV 8
 
 //FC levels
 #define FCVOLT_CSV 9 
