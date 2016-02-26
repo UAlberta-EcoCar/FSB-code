@@ -8,6 +8,7 @@
 #include <MemoryFree.h>
 #include <mcp2515_lib.h>
 #include <fc_can_messages.h>
+#include <mcp2515_filters.h>
 #include "FC_USART_CAN_BRIDGE_LIB.h"
 
 
@@ -24,7 +25,7 @@ void setup() {
   Serial.setTimeout(500);
 
   //start CAN-bus
-  while(can_init());
+  while(can_init(EXACT_FILTER_MASK,0,0,EXACT_FILTER_MASK,0,0,0,0)); //will ignore all rx messages
   digitalWrite(CAN_STATUS_LED,HIGH);
   
   // Short delay and then begin listening
@@ -84,47 +85,68 @@ void loop()
 
       //CHARGE_SINCE_LAST_PURGE
       val = parse_csv(FC_CHARGE_SINCE_LAST_PURGE_CSV,dataString);
+  	  send_fc_charge_since_last_purge((uint32_t) val);
 
       //TOTAL_CHARGE
       val = parse_csv(FC_TOTAL_CHARGE_CSV,dataString);
+	    send_fc_total_charge((uint32_t) val);
+
+      delay(1);
 
       //FCVOLT
       val = parse_csv(FCVOLT_CSV,dataString);
+  	  send_fc_volt((int32_t) val);
 
-    //FCCURR
-    val = parse_csv(FCCURR_CSV,dataString);
+      //FCCURR
+      val = parse_csv(FCCURR_CSV,dataString);
+  	  send_fc_curr((int32_t) val);
 
-    //FCTEMP
-    val = parse_csv(FCTEMP_CSV,dataString);
+      delay(1);
 
-    //FCPRES
-    val = parse_csv(FCPRES_CSV,dataString);
+      //FCTEMP
+      val = parse_csv(FCTEMP_CSV,dataString);
+  	  send_fc_temp((int32_t) val);
 
-    //CAPVOLT
-    val = parse_csv(CAPVOLT_CSV,dataString);
+      //FCPRES
+      val = parse_csv(FCPRES_CSV,dataString);
+  	  send_fc_pres((int32_t) val);
 
-    //FC_FAN_SPEED
-    val = parse_csv(FC_FAN_SPEED_CSV,dataString);
+      delay(1);
 
-    //FC_START_RELAY
-    val = parse_csv(FC_START_RELAY_CSV,dataString);
+      //CAPVOLT
+      val = parse_csv(CAPVOLT_CSV,dataString);
+  	  send_fc_capvolt((int32_t) val);
 
-    //FC_RES_RELAY
-    val = parse_csv(FC_RES_RELAY_CSV,dataString);
+      //FC_FAN_SPEED
+      val = parse_csv(FC_FAN_SPEED_CSV,dataString);
+  	  send_fc_fan_speed((int32_t) val);
 
-    //FC_CAP_RELAY
-    val = parse_csv(FC_CAP_RELAY_CSV,dataString);
+      delay(1);
 
-    //FC_MOTOR_RELAY
-    val = parse_csv(FC_MOTOR_RELAY_CSV,dataString);
-
-    //FC_PURGE_VALVE
-    val = parse_csv(FC_PURGE_VALVE_CSV,dataString);
-
-    //FC_H2_VALVE
-    val = parse_csv(FC_H2_VALVE_CSV,dataString);
-    Serial.println("");
-    Serial.print("freeMemory: ");
-    Serial.println(freeMemory());
+  	  //OUTPUTS
+	  
+      unsigned char val1 = parse_csv(FC_START_RELAY_CSV,dataString);
+      unsigned char val2 = parse_csv(FC_RES_RELAY_CSV,dataString);
+      unsigned char val3 = parse_csv(FC_CAP_RELAY_CSV,dataString);
+      unsigned char val4 = parse_csv(FC_MOTOR_RELAY_CSV,dataString);
+      unsigned char val5 = parse_csv(FC_PURGE_VALVE_CSV,dataString);
+      unsigned char val6 = parse_csv(FC_H2_VALVE_CSV,dataString);
+      
+      if((val1 | val2 | val3 | val4 | val5 | val6) > 1) //if returned value is not a sign bit there is something wrong
+      {
+        //set all values to 1 to show there is a problem
+        val1 = 1;
+        val2 = 1;
+        val3 = 1;
+        val4 = 0; //except motor relay, just in case we use that bit to tell motor it can run.
+        val5 = 1;
+        val6 = 1;
+      }
+  	  send_fc_outputs(val1,val2,val3,val4,val5,val6);
+      
+	  
+      Serial.println("");
+      Serial.print("freeMemory: ");
+      Serial.println(freeMemory());
     }
 }
