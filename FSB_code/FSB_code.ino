@@ -8,8 +8,9 @@
 
 #include "fsb_can_handler.h"
 #include "rtc.h"
+#include <mcp2515_lib.h>
 #include <SPI.h>
-#include <SD.h>
+//#include <SD.h>
 
 //Define CAN interrupt pin
 #define CAN_INIT 10
@@ -36,7 +37,7 @@ uint32_t sd_write_timer;
 #define TIME_WRITE_INTERVAL 250 //how often to send time over CAN bus
 uint32_t can_time_timer;
 
-#define PEDAL_DATA_WRITE_INTERVAL 100 //how often to send pedal data over CAN bus
+#define PEDAL_DATA_WRITE_INTERVAL 20 //how often to send pedal data over CAN bus
 uint32_t pedal_send_timer;
 
 //Heart beat timing
@@ -92,7 +93,7 @@ void setup() {
   pinMode(PEDAL_INPUT,INPUT);
 }
 
-
+CanMessage message;
 
 void loop() {
   
@@ -102,6 +103,7 @@ void loop() {
   {
     digitalWrite(CAN_STATUS_LED,HIGH);
     send_throttle(analogRead(PEDAL_INPUT));
+    Serial.println(analogRead(PEDAL_INPUT));
     //Serial.println(analogRead(PEDAL_INPUT));
     send_brake(analogRead(BRAKE_INPUT));
     digitalWrite(CAN_STATUS_LED,LOW);
@@ -114,6 +116,11 @@ void loop() {
     now = getTime();
     digitalWrite(CAN_STATUS_LED,HIGH);
     send_can_time(&now);
+    Serial.print(now.hour);
+    Serial.print(":");
+    Serial.print(now.minute);
+    Serial.print(":");
+    Serial.println(now.second);
     digitalWrite(CAN_STATUS_LED,LOW);
     can_time_timer = millis();
   }
@@ -127,4 +134,19 @@ void loop() {
     sd_write_timer = millis();
     digitalWrite(SD_STATUS_LED,LOW);
   }
+
+  //read can bus
+  if(digitalRead(9) == 0)
+  {
+    message = can_get_message();
+    Serial.print(message.id);
+    Serial.print("    ");
+    for(char x = 0;x<message.length;x++)
+    {
+      Serial.print(message.data[x]);
+      Serial.print("  ");
+    }
+    Serial.print("\n");
+  }
+  
 }

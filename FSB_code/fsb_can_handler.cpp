@@ -79,7 +79,17 @@ void send_can_time(RTC_Time *now)
   CanMessage msg;
   msg.id = can_time_msg.id();
   msg.length = can_time_msg.len();
-  can_time_msg.buf(msg.data,((now->year << can_msg::YEAR)|(now->month << can_msg::MONTH)|(now->monthDay << can_msg::DAY)|(now->hour << can_msg::HOUR)|(now->minute << can_msg::MINUTE)|(now->second << can_msg::SECOND)));
+  msg.data[can_msg::YEAR] = now->year;
+  msg.data[can_msg::MONTH] = now->month;
+  msg.data[can_msg::DAY] = now->monthDay;
+  msg.data[can_msg::HOUR] = now->hour;
+  msg.data[can_msg::MINUTE] = now->minute;
+  msg.data[can_msg::SECOND] = now->second;
+//  Serial.print(now->hour);
+//  Serial.print(":");
+//  Serial.print(now->minute);
+//  Serial.print(":");
+//  Serial.println(now->hour);
   while(can_send_message(&msg));
 }
 
