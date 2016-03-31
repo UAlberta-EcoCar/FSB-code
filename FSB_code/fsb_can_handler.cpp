@@ -8,6 +8,19 @@
 #include <mcp2515_filters.h>
 #include "rtc.h"
 
+//LCD Horn
+can_msg::MsgEncode lcd_horn_msg( can_msg::BOOL, can_msg::AUX, can_msg::HORN, can_msg::IMPORTANT, 1);
+
+//LCD WIpers
+can_msg::MsgEncode lcd_wipers_msg( can_msg::BOOL, can_msg::AUX, can_msg::WIPERS, can_msg::IMPORTANT, 1);
+
+//LCD Signals
+can_msg::MsgEncode lcd_signals_msg( can_msg::BOOL, can_msg::AUX, can_msg::SIGNAL, can_msg::IMPORTANT, 3);
+
+//LCD Headlight
+can_msg::MsgEncode lcd_headlights_msg( can_msg::BOOL, can_msg::AUX, can_msg::HEADLIGHTS, can_msg::IMPORTANT, 1);
+
+
 //motor message defines
 can_msg::MsgEncode throttle_msg( can_msg::UINT16, can_msg::MOTOR, can_msg::THROTTLE, can_msg::CRITICAL, 1 );
 can_msg::MsgEncode brake_msg( can_msg::UINT16, can_msg::MOTOR, can_msg::BRAKE, can_msg::CRITICAL, 1 );
@@ -103,4 +116,20 @@ void read_can_bus(void)
   CanMessage message;
   message = can_get_message();
   //filter through message ID's
+  if(message.id == lcd_horn_msg.id())
+  {
+    Serial.println("HORN");
+  }
+  if(message.id == lcd_wipers_msg.id())
+  {
+    Serial.println("WIPERS");
+  }
+  if(message.id == lcd_headlights_msg.id())
+  {
+    Serial.println("HEADLIGHTS");
+  }
+  if(message.id == lcd_signals_msg.id())
+  {
+    Serial.println("SIGNALS");
+  }
 }

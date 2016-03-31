@@ -10,7 +10,7 @@
 #include "rtc.h"
 #include <mcp2515_lib.h>
 #include <SPI.h>
-//#include <SD.h>
+#include <SD.h>
 
 //Define CAN interrupt pin
 #define CAN_INIT 10
@@ -62,7 +62,7 @@ String filename;
 
 void setup() {
   //Start Serial for debugging
-  Serial.begin(115200);
+  Serial.begin(9600);
   
   //Start CAN bus communications
   fsb_can_init();
@@ -80,6 +80,7 @@ void setup() {
   }
   //Serial.println("SD CARD CONNECTED");
   Serial.println("NO SD CARD");
+
   //Make new log file with time/date as name
   now = getTime();
   filename = String(now.year) + String(now.month) + String(now.monthDay) + String(now.hour) + String(now.minute) + String(now.second) + ".csv";
@@ -95,16 +96,12 @@ void setup() {
 
 CanMessage message;
 
-void loop() {
-  
-  
+void loop() { 
   //send gas and brake pedal readings over can bus
   if(millis() - pedal_send_timer > PEDAL_DATA_WRITE_INTERVAL)
   {
     digitalWrite(CAN_STATUS_LED,HIGH);
     send_throttle(analogRead(PEDAL_INPUT));
-    Serial.println(analogRead(PEDAL_INPUT));
-    //Serial.println(analogRead(PEDAL_INPUT));
     send_brake(analogRead(BRAKE_INPUT));
     digitalWrite(CAN_STATUS_LED,LOW);
     pedal_send_timer = millis();
@@ -116,11 +113,6 @@ void loop() {
     now = getTime();
     digitalWrite(CAN_STATUS_LED,HIGH);
     send_can_time(&now);
-    Serial.print(now.hour);
-    Serial.print(":");
-    Serial.print(now.minute);
-    Serial.print(":");
-    Serial.println(now.second);
     digitalWrite(CAN_STATUS_LED,LOW);
     can_time_timer = millis();
   }
@@ -138,15 +130,8 @@ void loop() {
   //read can bus
   if(digitalRead(9) == 0)
   {
-    message = can_get_message();
-    Serial.print(message.id);
-    Serial.print("    ");
-    for(char x = 0;x<message.length;x++)
-    {
-      Serial.print(message.data[x]);
-      Serial.print("  ");
-    }
-    Serial.print("\n");
+    digitalWrite(CAN_STATUS_LED,HIGH);
+    read_can_bus();
+    digitalWrite(CAN_STATUS_LED,LOW);
   }
-  
 }

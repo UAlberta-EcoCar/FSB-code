@@ -39,6 +39,23 @@ RTC_Time getTime(){
   now.monthDay = bcdToDec(Wire.read());
   now.month = bcdToDec(Wire.read());
   now.year = bcdToDec(Wire.read());
-  
+
+  //check data
+  if(now.second > 60)
+  {
+    now.second = 99;
+  }
+  if(now.minute > 60)
+  {
+    now.minute = 99;
+  }
+  if(now.hour > 24)
+  {
+    now.hour = 99;
+  }
+  if(now.monthDay > 31)
+  {
+    now.monthDay = 99;
+  }
   return(now);
 }
