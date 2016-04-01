@@ -120,16 +120,34 @@ void read_can_bus(void)
   {
     Serial.println("HORN");
   }
-  if(message.id == lcd_wipers_msg.id())
+  else if(message.id == lcd_wipers_msg.id())
   {
     Serial.println("WIPERS");
   }
-  if(message.id == lcd_headlights_msg.id())
+  else if(message.id == lcd_headlights_msg.id())
   {
     Serial.println("HEADLIGHTS");
   }
-  if(message.id == lcd_signals_msg.id())
+  else if(message.id == lcd_signals_msg.id())
   {
     Serial.println("SIGNALS");
   }
+  else if(message.id == brake_msg.id())
+  {
+    Serial.println("BRAKE");
+  }
+  else if(message.id == throttle_msg.id())
+  {
+    Serial.println("THROTTLE");
+  }
+  else
+  {
+    Serial.println(message.id);
+  }
+  for (char x = 0;x <= message.length;x++)
+  {
+    Serial.print(message.data[x]);
+    Serial.print(" ");
+  }
+  Serial.print("\n\n");
 }

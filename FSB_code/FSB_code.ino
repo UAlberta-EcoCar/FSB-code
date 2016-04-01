@@ -23,8 +23,8 @@
 #define SD_STATUS_LED 3
 
 //define pedal input pins
-#define BRAKE_INPUT A0
-#define PEDAL_INPUT A1
+#define BRAKE_INPUT A2
+#define PEDAL_INPUT A3
 
 
 ////////////////
