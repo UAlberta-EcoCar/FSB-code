@@ -37,7 +37,7 @@ uint32_t sd_write_timer;
 #define TIME_WRITE_INTERVAL 250 //how often to send time over CAN bus
 uint32_t can_time_timer;
 
-#define PEDAL_DATA_WRITE_INTERVAL 20 //how often to send pedal data over CAN bus
+#define PEDAL_DATA_WRITE_INTERVAL 1000 //how often to send pedal data over CAN bus
 uint32_t pedal_send_timer;
 
 //Heart beat timing
@@ -69,8 +69,8 @@ void setup() {
   Serial.println("CAN STARTED");
   
   //connect to RTC
-  connect_to_rtc();
-  Serial.println("RTC CONNECTED");
+//  connect_to_rtc();
+  //Serial.println("RTC CONNECTED");
   
   delay(500);
   
@@ -79,11 +79,11 @@ void setup() {
     delay(1000);
   }
   //Serial.println("SD CARD CONNECTED");
-  Serial.println("NO SD CARD");
+  //Serial.println("NO SD CARD");
 
   //Make new log file with time/date as name
-  now = getTime();
-  filename = String(now.year) + String(now.month) + String(now.monthDay) + String(now.hour) + String(now.minute) + String(now.second) + ".csv";
+  //now = getTime();
+//  filename = String(now.year) + String(now.month) + String(now.monthDay) + String(now.hour) + String(now.minute) + String(now.second) + ".csv";
   //File dataFile = SD.open(filename,FILE_WRITE);
   //delay(100);
   //dataFile.close();
@@ -94,44 +94,43 @@ void setup() {
   pinMode(PEDAL_INPUT,INPUT);
 }
 
-CanMessage message;
+CanMessage horn_mess;
 
 void loop() { 
   //send gas and brake pedal readings over can bus
   if(millis() - pedal_send_timer > PEDAL_DATA_WRITE_INTERVAL)
   {
     digitalWrite(CAN_STATUS_LED,HIGH);
+    horn_mess.id = 560;
+    horn_mess.data[0] ^= 1;
+    while(can_send_message(&horn_mess));
+    delay(10);
     send_throttle(analogRead(PEDAL_INPUT));
     send_brake(analogRead(BRAKE_INPUT));
     digitalWrite(CAN_STATUS_LED,LOW);
+    Serial.println("Sent");
     pedal_send_timer = millis();
   }
   
   //send time over can bus
   if(millis() - can_time_timer > TIME_WRITE_INTERVAL)
   {
-    now = getTime();
-    digitalWrite(CAN_STATUS_LED,HIGH);
-    send_can_time(&now);
-    digitalWrite(CAN_STATUS_LED,LOW);
-    can_time_timer = millis();
+    //now = getTime();
+    //digitalWrite(CAN_STATUS_LED,HIGH);
+    //send_can_time(&now);
+    //digitalWrite(CAN_STATUS_LED,LOW);
+    //can_time_timer = millis();
   }
   
   //write to SD card
   if(millis() - sd_write_timer > SD_WRITE_INTERVAL)
   {
-    now = getTime();
-    digitalWrite(SD_STATUS_LED,HIGH);
-    delay(10);
-    sd_write_timer = millis();
-    digitalWrite(SD_STATUS_LED,LOW);
+    //now = getTime();
+    //digitalWrite(SD_STATUS_LED,HIGH);
+    //delay(10);
+    //sd_write_timer = millis();
+    //digitalWrite(SD_STATUS_LED,LOW);
   }
 
-  //read can bus
-  if(digitalRead(9) == 0)
-  {
-    digitalWrite(CAN_STATUS_LED,HIGH);
     read_can_bus();
-    digitalWrite(CAN_STATUS_LED,LOW);
-  }
 }

@@ -107,7 +107,39 @@ void send_can_time(RTC_Time *now)
 }
 
 //DEFINE VARIABLES TO BE RECEIVED OVER CAN BUS AND FUNCTIONS TO ACCESS THEM
+uint16_t car_speed;
+uint16_t brake;
 
+int32_t FC_VOLT;
+
+
+void display_data(CanMessage * message)
+{
+  if(((message->id & 7) == 1)|((message->id & 7) == 2))
+  {
+    for(char x = 0; x < message->length;x++)
+    {
+      Serial.print(message->data[x]);
+      Serial.print(" "); 
+    }
+  }
+  else if(((message->id & 7) == 3)|((message->id & 7) == 4))
+  {
+    for(char x = 0; x < (message->length/2);x++)
+    {
+      Serial.print(message->data[2*x] | (message->data[2*x+1] << ((2*x+1)*8)));
+      Serial.print("  ");
+    }
+  }
+  else if(((message->id & 7) == 5)|((message->id & 7) == 6))
+  {
+    for(char x = 0; x < (message->length/4);x++)
+    {
+      Serial.print(message->data[4*x] | (message->data[4*x+1] << ((4*x + 1)*8)) | (message->data[4*x+2] << ((4*x+1)*8)) | (message->data[4*x+3] << ((4*x+2)*8)));
+      Serial.print("  ");
+    }
+  }
+}
 
 
 //FUNCTION FOR FILTERING THROUGH ALL THE MESSAGE ID's AND COLLECTING DATA
@@ -140,14 +172,15 @@ void read_can_bus(void)
   {
     Serial.println("THROTTLE");
   }
-  else
+  else if(message.id == fc_volt_msg.id())
+  {
+    Serial.println("FCVOLT");
+    FC_VOLT = message.data[0] | (message.data[1] << 8) | (message.data[2] << 16) | (message.data[3] << 24);
+  }
+  else if (message.id != 0)
   {
     Serial.println(message.id);
   }
-  for (char x = 0;x <= message.length;x++)
-  {
-    Serial.print(message.data[x]);
-    Serial.print(" ");
-  }
-  Serial.print("\n\n");
+//  display_data(&message);
+  //Serial.print("\n\n");
 }
