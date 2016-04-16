@@ -3,12 +3,39 @@
 
 #include "rtc.h"
 
-void fsb_can_init(void);
 
-void read_can_bus(void);
+class Can {
+public:
+  Can() {};
+  void begin();
 
-void send_throttle(uint16_t val);
-void send_brake(uint16_t val);
-void send_can_time(RTC_Time *now);
+  void read();
+  void send_throttle(uint16_t val);
+  void send_brake(uint16_t val);
+  void send_time(RTC_Time *now);
+
+  //motor vars
+  uint16_t speed;
+  uint16_t throttle;
+  uint16_t brake;
+  uint16_t mcurrent;
+
+  //fuel cell vars
+  int32_t FC_VOLT;
+  int32_t CAP_VOLT;
+  int32_t FC_TEMP;
+  uint16_t FC_ERROR;
+  uint8_t FC_PURGE_COUNT;
+
+  //aux/lcd
+  bool horn;
+  bool wipers;
+  bool headlights;
+
+  //"heart beat monitoring"
+  bool aux_online;
+  bool fc_online;
+};
+
 
 #endif

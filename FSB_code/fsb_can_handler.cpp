@@ -60,34 +60,56 @@ can_msg::MsgEncode fc_outputs_msg( can_msg::BOOL, can_msg::FUEL_CELL, can_msg::F
 can_msg::MsgEncode can_time_msg( can_msg::UINT8, can_msg::OTHER, can_msg::TIME, can_msg::INFORMATION, 6);
 
 
+  //fuel cell vars
+  int32_t FC_VOLT;
+  int32_t CAP_VOLT;
+  uint16_t FC_ERROR;
+  int32_t FC_TEMP;
+  uint8_t FC_PURGE_COUNT;
+
+  //aux/lcd
+  bool horn;
+  bool wipers;
+  bool headlights;
+
+  //motor
+  uint16_t throttle;
+  uint16_t brake;
+  uint16_t speed;
+  uint16_t mcurrent;
+
+  //"heart beat monitoring"
+  bool aux_online;
+  bool fc_online;
+
+
 //Starts can bus
-void fsb_can_init(void)
+void Can::begin(void)
 {
-    while(can_init(0,0,0,0,0,0,0,0))
-    {
-        delay(100);
-    }
+    can_init(0,0,0,0,0,0,0,0);
 }
 
 //FUNCTIONS FOR SENDING VALUES OVER CAN BUS
-void send_throttle(uint16_t val) {
+void Can::send_throttle(uint16_t val) {
   // send throttle value
+  throttle = val;
   CanMessage msg;
   msg.id = throttle_msg.id();
-  msg.length = 2;
+  msg.length = throttle_msg.len();
   throttle_msg.buf(msg.data, val);
-  while(can_send_message(&msg));
+  can_send_message(&msg);
 }
-void send_brake(uint16_t val) {
+void Can::send_brake(uint16_t val) {
   // send brake value
+  brake = val;
   CanMessage msg;
   msg.id = brake_msg.id();
   msg.length = brake_msg.len();
   brake_msg.buf(msg.data, val);
-  while(can_send_message(&msg));
+  can_send_message(&msg);
 }
 
-void send_can_time(RTC_Time *now)
+void Can::send_time(RTC_Time *now)
 {
   CanMessage msg;
   msg.id = can_time_msg.id();
@@ -98,89 +120,89 @@ void send_can_time(RTC_Time *now)
   msg.data[can_msg::HOUR] = now->hour;
   msg.data[can_msg::MINUTE] = now->minute;
   msg.data[can_msg::SECOND] = now->second;
-//  Serial.print(now->hour);
-//  Serial.print(":");
-//  Serial.print(now->minute);
-//  Serial.print(":");
-//  Serial.println(now->hour);
-  while(can_send_message(&msg));
+  can_send_message(&msg);
 }
 
-//DEFINE VARIABLES TO BE RECEIVED OVER CAN BUS AND FUNCTIONS TO ACCESS THEM
-uint16_t car_speed;
-uint16_t brake;
-
-int32_t FC_VOLT;
-
-
-void display_data(CanMessage * message)
-{
-  if(((message->id & 7) == 1)|((message->id & 7) == 2))
-  {
-    for(char x = 0; x < message->length;x++)
-    {
-      Serial.print(message->data[x]);
-      Serial.print(" "); 
-    }
-  }
-  else if(((message->id & 7) == 3)|((message->id & 7) == 4))
-  {
-    for(char x = 0; x < (message->length/2);x++)
-    {
-      Serial.print(message->data[2*x] | (message->data[2*x+1] << ((2*x+1)*8)));
-      Serial.print("  ");
-    }
-  }
-  else if(((message->id & 7) == 5)|((message->id & 7) == 6))
-  {
-    for(char x = 0; x < (message->length/4);x++)
-    {
-      Serial.print(message->data[4*x] | (message->data[4*x+1] << ((4*x + 1)*8)) | (message->data[4*x+2] << ((4*x+1)*8)) | (message->data[4*x+3] << ((4*x+2)*8)));
-      Serial.print("  ");
-    }
-  }
-}
 
 
 //FUNCTION FOR FILTERING THROUGH ALL THE MESSAGE ID's AND COLLECTING DATA
-void read_can_bus(void)
+void Can::read(void)
 {
   CanMessage message;
   message = can_get_message();
   //filter through message ID's
   if(message.id == lcd_horn_msg.id())
   {
-    Serial.println("HORN");
+    if(message.data[0])
+    {
+      horn = 1;
+    }
+    else
+    {
+      horn = 0;
+    }
   }
   else if(message.id == lcd_wipers_msg.id())
   {
-    Serial.println("WIPERS");
+    if(message.data[0])
+    {
+      wipers = 1;
+    }
+    else
+    {
+      wipers = 0;
+    }
   }
   else if(message.id == lcd_headlights_msg.id())
   {
-    Serial.println("HEADLIGHTS");
+    if(message.data[0])
+    {
+      headlights = 1;
+    }
+    else
+    {
+      headlights = 0;
+    }
   }
   else if(message.id == lcd_signals_msg.id())
   {
-    Serial.println("SIGNALS");
+    
   }
   else if(message.id == brake_msg.id())
   {
-    Serial.println("BRAKE");
+    //Serial.println("BRAKE");
   }
   else if(message.id == throttle_msg.id())
   {
-    Serial.println("THROTTLE");
+    //Serial.println("THROTTLE");
   }
+  else if(message.id == mspeed_msg.id())
+  {
+    speed = message.data[0] | (message.data[1] << 8);
+  }
+  else if( message.id == mcurrent_msg.id())
+  {
+    mcurrent = message.data[0] | (message.data[1] << 8);
+  }
+  
   else if(message.id == fc_volt_msg.id())
   {
-    Serial.println("FCVOLT");
     FC_VOLT = message.data[0] | (message.data[1] << 8) | (message.data[2] << 16) | (message.data[3] << 24);
+  }
+  else if(message.id == fc_capvolt_msg.id())
+  {
+    CAP_VOLT = message.data[0] | (message.data[1] << 8) | (message.data[2] << 16) | (message.data[3] << 24);
+  }
+  else if (message.id == fc_temp_msg.id())
+  {
+    FC_TEMP = message.data[0] | (message.data[1] << 8) | (message.data[2] << 16) | (message.data[3] << 24);
+  }
+  else if (message.id == fc_purge_count_msg.id())
+  {
+    FC_PURGE_COUNT = message.data[0];
   }
   else if (message.id != 0)
   {
-    Serial.println(message.id);
+    //Serial.println(message.id);
   }
-//  display_data(&message);
-  //Serial.print("\n\n");
 }
