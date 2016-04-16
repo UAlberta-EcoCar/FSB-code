@@ -14,11 +14,9 @@
 //Define CAN interrupt pin
 #define CAN_INIT 10
 
-//define SD card CS pin
-#define SD_CS 10
 
 //define status leds
-#define CAN_STATUS_LED 2
+#define CAN_STATUS_LED A0
 #define SD_STATUS_LED 3
 
 //define pedal input pins
