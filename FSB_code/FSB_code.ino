@@ -70,7 +70,12 @@ void loop() {
   if(millis() - time_var > 100)
   { 
   time_var = millis();
+  Serial.print(myCan.FC_VOLT);
+  Serial.print(" ");
+  Serial.println(myCan.speed);
+  
   }
+
   
   //send gas and brake pedal readings over can bus
   if((millis() - pedal_send_timer) > PEDAL_DATA_WRITE_INTERVAL)
@@ -94,6 +99,5 @@ void loop() {
     myCan.read();
     myCan.read();
     digitalWrite(CAN_STATUS_LED,LOW);
-
   }
 }
