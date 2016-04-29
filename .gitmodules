@@ -1,0 +1,3 @@
+[submodule "libraries/DS1307-RTC-library"]
+	path = libraries/DS1307-RTC-library
+	url = https://github.com/UAlberta-EcoCar/DS1307-RTC-library.git
