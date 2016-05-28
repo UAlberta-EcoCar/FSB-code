@@ -7,6 +7,3 @@
 [submodule "libraries/mcp2515_lib"]
 	path = libraries/mcp2515_lib
 	url = https://github.com/UAlberta-EcoCar/mcp2515_lib.git
-[submodule "libraries/ArduinoTimer"]
-	path = libraries/ArduinoTimer
-	url = https://github.com/UAlberta-EcoCar/ArduinoTimer.git

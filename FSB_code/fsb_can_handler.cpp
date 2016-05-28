@@ -131,78 +131,8 @@ void Can::read(void)
   CanMessage message;
   message = can_get_message();
   //filter through message ID's
-  if(message.id == lcd_horn_msg.id())
-  {
-    if(message.data[0])
-    {
-      horn = 1;
-    }
-    else
-    {
-      horn = 0;
-    }
-  }
-  else if(message.id == lcd_wipers_msg.id())
-  {
-    if(message.data[0])
-    {
-      wipers = 1;
-    }
-    else
-    {
-      wipers = 0;
-    }
-  }
-  else if(message.id == lcd_headlights_msg.id())
-  {
-    if(message.data[0])
-    {
-      headlights = 1;
-    }
-    else
-    {
-      headlights = 0;
-    }
-  }
-  else if(message.id == lcd_signals_msg.id())
-  {
-    
-  }
-  else if(message.id == brake_msg.id())
-  {
-    //Serial.println("BRAKE");
-  }
-  else if(message.id == throttle_msg.id())
-  {
-    //Serial.println("THROTTLE");
-  }
-  else if(message.id == mspeed_msg.id())
-  {
-    speed = message.data[0] | (message.data[1] << 8);
-  }
-  else if( message.id == mcurrent_msg.id())
-  {
-    mcurrent = message.data[0] | (message.data[1] << 8);
-  }
-  
-  else if(message.id == fc_volt_msg.id())
-  {
-    FC_VOLT = message.data[0] | (message.data[1] << 8) | (message.data[2] << 16) | (message.data[3] << 24);
-  }
-  else if(message.id == fc_capvolt_msg.id())
-  {
-    CAP_VOLT = message.data[0] | (message.data[1] << 8) | (message.data[2] << 16) | (message.data[3] << 24);
-  }
-  else if (message.id == fc_temp_msg.id())
-  {
-    FC_TEMP = message.data[0] | (message.data[1] << 8) | (message.data[2] << 16) | (message.data[3] << 24);
-  }
-  else if (message.id == fc_purge_count_msg.id())
-  {
-    FC_PURGE_COUNT = message.data[0];
-  }
-  else if (message.id != 0)
-  {
-    //Serial.println(message.id);
+  if(message.id != 0)
+  { 
+   Serial.println(message.id);
   }
 }
