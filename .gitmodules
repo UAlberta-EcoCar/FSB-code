@@ -1,3 +1,0 @@
-[submodule "libraries/mcp2515_lib"]
-	path = libraries/mcp2515_lib
-	url = https://github.com/UAlberta-EcoCar/mcp2515_lib.git
