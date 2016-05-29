@@ -7,7 +7,7 @@
     //Possibly Reading Gas and Brake Pedals
 
 #include "fsb_can_handler.h"
-#include "rtc.h"
+#include <rtc.h>
 #include <mcp2515_lib.h>
 #include <SPI.h>
 
@@ -16,8 +16,8 @@
 
 
 //define status leds
-#define CAN_STATUS_LED A0
-#define SD_STATUS_LED 3
+#define CAN_STATUS_LED 3
+#define SD_STATUS_LED 2
 
 //define pedal input pins
 #define BRAKE_INPUT A2
@@ -47,48 +47,21 @@ void setup() {
   
   //Start Serial for debugging
   Serial.begin(9600);
-  Serial.println("HI");
+  delay(100);
+  
   //Start CAN bus communications
   myCan.begin();
   Serial.println("CAN STARTED");
   
-  //connect to RTC
-  connect_to_rtc();
-  Serial.println("RTC CONNECTED");
-
   digitalWrite(CAN_STATUS_LED,HIGH);
+
+  delay(100);
   
-  
-  //Make new log file with time/date as name
-  //now = getTime();
-  filename = String(now.year) + String(now.month) + String(now.monthDay) + String(now.hour) + String(now.minute) + String(now.second) + ".csv";
-}
+  }
 
 uint32_t time_var;
 
 void loop() { 
-  if(millis() - time_var > 100)
-  { 
-  time_var = millis();
-  
-  }
-
-  
-  //send gas and brake pedal readings over can bus
-  if((millis() - pedal_send_timer) > PEDAL_DATA_WRITE_INTERVAL)
-  {
-    myCan.send_throttle(analogRead(PEDAL_INPUT));
-    myCan.send_brake(analogRead(BRAKE_INPUT));
-    pedal_send_timer = millis();
-  }
-  
-  //send time over can bus
-  if(millis() - can_time_timer > TIME_WRITE_INTERVAL)
-  {
-    //now = getTime();
-    myCan.send_time(&now);
-    can_time_timer = millis();
-  }
   
   if(digitalRead(9) == 0)
   {

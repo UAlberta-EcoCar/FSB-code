@@ -1,8 +1,8 @@
 #ifndef FSB_CAN_HANDLER_H
 #define FSB_CAN_HANDLER_H
 
-#include "rtc.h"
-
+#include <rtc.h>
+#include <Arduino.h>
 
 class Can {
 public:
