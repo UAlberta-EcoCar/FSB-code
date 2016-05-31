@@ -60,6 +60,8 @@ void setup() {
   }
 
 uint32_t time_var;
+#define comma Serial.print(',')
+#define NL Serial.print('\n');
 
 void loop() { 
   
@@ -67,7 +69,34 @@ void loop() {
   {
     digitalWrite(CAN_STATUS_LED,HIGH);
     myCan.read();
-    myCan.read();
     digitalWrite(CAN_STATUS_LED,LOW);
+  }
+
+  if(millis() - time_var > 500)
+  {
+    Serial.print(myCan.fc_error);comma;
+    Serial.print(myCan.fc_state);comma;
+    Serial.print(myCan.fc_purge_count);comma;
+    Serial.print(myCan.fc_time_between_last_purges);comma;
+    Serial.print(myCan.fc_energy_since_last_purge);comma;
+    Serial.print(myCan.fc_total_energy);comma;
+    Serial.print(myCan.fc_charge_since_last_purge);comma;
+    Serial.print(myCan.fc_total_charge);comma;
+    Serial.print(myCan.fc_volt);comma;
+    Serial.print(myCan.fc_curr);comma;
+    Serial.print(myCan.fc_capvolt);comma;
+    Serial.print(myCan.fc_temp);comma;
+    Serial.print(myCan.fc_opttemp);comma;
+    Serial.print(myCan.fc_pres);comma;
+    Serial.print(myCan.fc_fan_speed);comma;
+
+    Serial.print(myCan.fc_start_relay);comma;
+    Serial.print(myCan.fc_res_relay);comma;
+    Serial.print(myCan.fc_cap_relay);comma;
+    Serial.print(myCan.fc_motor_relay);comma;
+    Serial.print(myCan.fc_purge_valve);comma;
+    Serial.print(myCan.fc_h2_valve);NL;
+
+    time_var = millis();
   }
 }

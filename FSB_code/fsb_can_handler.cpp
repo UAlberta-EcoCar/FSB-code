@@ -46,7 +46,7 @@ can_msg::MsgEncode fc_volt_msg( can_msg::INT32, can_msg::FUEL_CELL, can_msg::FC_
 //FCCURR
 can_msg::MsgEncode fc_curr_msg( can_msg::INT32, can_msg::FUEL_CELL, can_msg::FC_CURR, can_msg::INFORMATION, 1);
 //FCTEMP
-can_msg::MsgEncode fc_temp_msg( can_msg::INT32, can_msg::FUEL_CELL, can_msg::FC_TEMP, can_msg::INFORMATION, 1);
+can_msg::MsgEncode fc_temp_msg( can_msg::UINT8, can_msg::FUEL_CELL, can_msg::FC_TEMP, can_msg::INFORMATION, 2);
 //FCPRES
 can_msg::MsgEncode fc_pres_msg( can_msg::INT32, can_msg::FUEL_CELL, can_msg::FC_PRES, can_msg::INFORMATION, 1);
 //CAPVOLT
@@ -60,27 +60,8 @@ can_msg::MsgEncode fc_outputs_msg( can_msg::BOOL, can_msg::FUEL_CELL, can_msg::F
 can_msg::MsgEncode can_time_msg( can_msg::UINT8, can_msg::OTHER, can_msg::TIME, can_msg::INFORMATION, 6);
 
 
-  //fuel cell vars
-  int32_t FC_VOLT;
-  int32_t CAP_VOLT;
-  uint16_t FC_ERROR;
-  int32_t FC_TEMP;
-  uint8_t FC_PURGE_COUNT;
 
-  //aux/lcd
-  bool horn;
-  bool wipers;
-  bool headlights;
 
-  //motor
-  uint16_t throttle;
-  uint16_t brake;
-  uint16_t speed;
-  uint16_t mcurrent;
-
-  //"heart beat monitoring"
-  bool aux_online;
-  bool fc_online;
 
 
 //Starts can bus
@@ -90,38 +71,38 @@ void Can::begin(void)
 }
 
 //FUNCTIONS FOR SENDING VALUES OVER CAN BUS
-void Can::send_throttle(uint16_t val) {
-  // send throttle value
-  throttle = val;
-  CanMessage msg;
-  msg.id = throttle_msg.id();
-  msg.length = throttle_msg.len();
-  throttle_msg.buf(msg.data, val);
-  can_send_message(&msg);
-}
-void Can::send_brake(uint16_t val) {
-  // send brake value
-  brake = val;
-  CanMessage msg;
-  msg.id = brake_msg.id();
-  msg.length = brake_msg.len();
-  brake_msg.buf(msg.data, val);
-  can_send_message(&msg);
-}
-
-void Can::send_time(RTC_Time *now)
-{
-  CanMessage msg;
-  msg.id = can_time_msg.id();
-  msg.length = can_time_msg.len();
-  msg.data[can_msg::YEAR] = now->year;
-  msg.data[can_msg::MONTH] = now->month;
-  msg.data[can_msg::DAY] = now->monthDay;
-  msg.data[can_msg::HOUR] = now->hour;
-  msg.data[can_msg::MINUTE] = now->minute;
-  msg.data[can_msg::SECOND] = now->second;
-  can_send_message(&msg);
-}
+//void Can::send_throttle(uint16_t val) {
+//  // send throttle value
+//  throttle = val;
+//  CanMessage msg;
+//  msg.id = throttle_msg.id();
+//  msg.length = throttle_msg.len();
+//  throttle_msg.buf(msg.data, val);
+//  can_send_message(&msg);
+//}
+//void Can::send_brake(uint16_t val) {
+//  // send brake value
+//  brake = val;
+//  CanMessage msg;
+//  msg.id = brake_msg.id();
+//  msg.length = brake_msg.len();
+//  brake_msg.buf(msg.data, val);
+//  can_send_message(&msg);
+//}
+//
+//void Can::send_time(RTC_Time *now)
+//{
+//  CanMessage msg;
+//  msg.id = can_time_msg.id();
+//  msg.length = can_time_msg.len();
+//  msg.data[can_msg::YEAR] = now->year;
+//  msg.data[can_msg::MONTH] = now->month;
+//  msg.data[can_msg::DAY] = now->monthDay;
+//  msg.data[can_msg::HOUR] = now->hour;
+//  msg.data[can_msg::MINUTE] = now->minute;
+//  msg.data[can_msg::SECOND] = now->second;
+//  can_send_message(&msg);
+//}
 
 
 
@@ -133,10 +114,65 @@ void Can::read(void)
   //filter through message ID's
   if(message.id != 0)
   { 
-    if(message.id != 0)
+    if (message.id == fc_error_msg.id())
     {
-      Serial.print("     "); 
-      Serial.println(message.id);
+      fc_error = message.data[0] | (message.data[1] << 8);
+    }
+    else if (message.id == fc_state_msg.id())
+    {
+      fc_state = message.data[0];
+    }
+    else if (message.id == fc_purge_count_msg.id())
+    {
+      fc_purge_count = message.data[0];
+    }
+    else if (message.id == fc_time_between_last_purges_msg.id())
+    {
+      fc_time_between_last_purges = message.data[0] | (message.data[1] << 8) | (message.data[2] << 16) | (message.data[3] << 24);
+    }
+    else if (message.id == fc_energy_msg.id())
+    {
+      fc_energy_since_last_purge = message.data[4] | (message.data[5] << 8) | (message.data[6] << 16) | (message.data[7] << 24);
+      fc_total_energy = message.data[0] | (message.data[1] << 8) | (message.data[2] << 16) | (message.data[3] << 24);
+    }
+    else if (message.id == fc_charge_msg.id())
+    {
+      fc_charge_since_last_purge = message.data[4] | (message.data[5] << 8) | (message.data[6] << 16) | (message.data[7] << 24);
+      fc_total_charge = message.data[0] | (message.data[1] << 8) | (message.data[2] << 16) | (message.data[3] << 24);
+    }
+    else if (message.id == fc_volt_msg.id())
+    {
+      fc_volt = message.data[0] | (message.data[1] << 8) | (message.data[2] << 16) | (message.data[3] << 24);
+    }
+    else if (message.id == fc_curr_msg.id())
+    {
+      fc_curr =  message.data[0] | (message.data[1] << 8) | (message.data[2] << 16) | (message.data[3] << 24);
+    }
+    else if (message.id == fc_temp_msg.id())
+    {
+      fc_temp = message.data[0];
+      fc_opttemp = message.data[1];
+    }
+    else if (message.id == fc_pres_msg.id())
+    {
+      fc_pres = message.data[0] | (message.data[1] << 8) | (message.data[2] << 16) | (message.data[3] << 24);
+    }
+    else if (message.id == fc_capvolt_msg.id())
+    {
+      fc_capvolt = message.data[0] | (message.data[1] << 8) | (message.data[2] << 16) | (message.data[3] << 24);
+    }
+    else if (message.id == fc_fan_speed_msg.id())
+    {
+      fc_fan_speed = message.data[0] | (message.data[1] << 8) | (message.data[2] << 16) | (message.data[3] << 24);
+    }
+    else if (message.id == fc_outputs_msg.id())
+    {
+      fc_start_relay = message.data[0] & (1 << can_msg::FC_START_RELAY);
+      fc_res_relay = message.data[0] & (1 << can_msg::FC_RES_RELAY);
+      fc_cap_relay = message.data[0] & (1 << can_msg::FC_CAP_RELAY);
+      fc_motor_relay = message.data[0] & (1 << can_msg::FC_MOTOR_RELAY);
+      fc_purge_valve = message.data[0] & (1 << can_msg::FC_PURGE_VALVE);
+      fc_h2_valve = message.data[0] & (1 << can_msg::FC_H2_VALVE);
     }
   }
 }
