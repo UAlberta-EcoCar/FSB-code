@@ -23,7 +23,7 @@ can_msg::MsgEncode lcd_headlights_msg( can_msg::BOOL, can_msg::AUX, can_msg::HEA
 
 //motor message defines
 can_msg::MsgEncode throttle_msg( can_msg::UINT16, can_msg::MOTOR, can_msg::THROTTLE, can_msg::CRITICAL, 1 );
-can_msg::MsgEncode brake_msg( can_msg::UINT16, can_msg::MOTOR, can_msg::BRAKE, can_msg::CRITICAL, 1 );
+can_msg::MsgEncode brake_msg( can_msg::BOOL, can_msg::MOTOR, can_msg::BRAKE, can_msg::CRITICAL, 1 );
 can_msg::MsgEncode merror_msg( can_msg::BOOL, can_msg::MOTOR, can_msg::MERROR, can_msg::IMPORTANT, 2 );
 can_msg::MsgEncode mspeed_msg( can_msg::INT16, can_msg::MOTOR, can_msg::MSPEED, can_msg::INFORMATION, 1 );
 can_msg::MsgEncode mcurrent_msg( can_msg::INT16, can_msg::MOTOR, can_msg::MCURRENT, can_msg::INFORMATION, 1 );
@@ -74,7 +74,7 @@ can_msg::MsgEncode can_time_msg( can_msg::UINT8, can_msg::OTHER, can_msg::TIME, 
 
   //motor
   uint16_t throttle;
-  uint16_t brake;
+  bool brake;
   uint16_t speed;
   uint16_t mcurrent;
 
@@ -99,7 +99,7 @@ void Can::send_throttle(uint16_t val) {
   throttle_msg.buf(msg.data, val);
   can_send_message(&msg);
 }
-void Can::send_brake(uint16_t val) {
+void Can::send_brake(bool val) {
   // send brake value
   brake = val;
   CanMessage msg;
@@ -166,7 +166,7 @@ void Can::read(void)
   }
   else if(message.id == lcd_signals_msg.id())
   {
-    
+
   }
   else if(message.id == brake_msg.id())
   {
@@ -184,7 +184,7 @@ void Can::read(void)
   {
     mcurrent = message.data[0] | (message.data[1] << 8);
   }
-  
+
   else if(message.id == fc_volt_msg.id())
   {
     FC_VOLT = message.data[0] | (message.data[1] << 8) | (message.data[2] << 16) | (message.data[3] << 24);

@@ -11,13 +11,12 @@ public:
 
   void read();
   void send_throttle(uint16_t val);
-  void send_brake(uint16_t val);
+  void send_brake(bool val);  
   void send_time(RTC_Time *now);
 
   //motor vars
   uint16_t speed;
   uint16_t throttle;
-  uint16_t brake;
   uint16_t mcurrent;
 
   //fuel cell vars
@@ -31,6 +30,7 @@ public:
   bool horn;
   bool wipers;
   bool headlights;
+  bool brake;
 
   //"heart beat monitoring"
   bool aux_online;
