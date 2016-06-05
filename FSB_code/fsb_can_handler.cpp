@@ -6,7 +6,7 @@
 #include <mcp2515_lib.h>
 #include <Arduino.h>
 #include <mcp2515_filters.h>
-#include "rtc.h"
+#include <rtc.h>
 
 //LCD Horn
 can_msg::MsgEncode lcd_horn_msg( can_msg::BOOL, can_msg::AUX, can_msg::HORN, can_msg::IMPORTANT, 1);
@@ -131,12 +131,14 @@ void Can::read(void)
   CanMessage message;
   message = can_get_message();
   //filter through message ID's
-  if(message.id == lcd_horn_msg.id())
-  {
-    if(message.data[0])
+  if(message.id != 0)
+  { 
+    if(message.id != 0)
     {
-      horn = 1;
+      Serial.print("     "); 
+      Serial.println(message.id);
     }
+<<<<<<< HEAD
     else
     {
       horn = 0;
@@ -204,5 +206,7 @@ void Can::read(void)
   else if (message.id != 0)
   {
     //Serial.println(message.id);
+=======
+>>>>>>> 056bfdb5306366a4e68a599c359a0391982d068c
   }
 }

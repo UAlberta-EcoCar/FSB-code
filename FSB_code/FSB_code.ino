@@ -7,7 +7,7 @@
     //Possibly Reading Gas and Brake Pedals
 
 #include "fsb_can_handler.h"
-#include "rtc.h"
+#include <rtc.h>
 #include <mcp2515_lib.h>
 #include <SPI.h>
 
@@ -18,8 +18,8 @@
 
 
 //define status leds
-#define CAN_STATUS_LED A0
-#define SD_STATUS_LED 3
+#define CAN_STATUS_LED 3
+#define SD_STATUS_LED 2
 
 //define pedal input pins
 #define BRAKE_INPUT A2
@@ -51,10 +51,12 @@ void setup() {
 
   //Start Serial for debugging
   Serial.begin(9600);
-  Serial.println("HI");
+  delay(100);
+  
   //Start CAN bus communications
   myCan.begin();
   Serial.println("CAN STARTED");
+<<<<<<< HEAD
 
   //connect to RTC
   connect_to_rtc();
@@ -67,10 +69,19 @@ void setup() {
   //now = getTime();
   filename = String(now.year) + String(now.month) + String(now.monthDay) + String(now.hour) + String(now.minute) + String(now.second) + ".csv";
 }
+=======
+  
+  digitalWrite(CAN_STATUS_LED,HIGH);
+
+  delay(100);
+  
+  }
+>>>>>>> 056bfdb5306366a4e68a599c359a0391982d068c
 
 uint32_t time_var;
 uint16_t SD_STATUS_LED_hold;
 
+<<<<<<< HEAD
 void loop() {
   if(millis() - time_var > 100)
   {
@@ -112,5 +123,15 @@ void loop() {
     digitalWrite(SD_STATUS_LED, !digitalRead(SD_STATUS_LED));
     Serial.print("Read something");
     Serial.println(millis());
+=======
+void loop() { 
+  
+  if(digitalRead(9) == 0)
+  {
+    digitalWrite(CAN_STATUS_LED,HIGH);
+    myCan.read();
+    myCan.read();
+    digitalWrite(CAN_STATUS_LED,LOW);
+>>>>>>> 056bfdb5306366a4e68a599c359a0391982d068c
   }
 }
