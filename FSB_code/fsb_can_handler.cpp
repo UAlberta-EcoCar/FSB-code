@@ -23,7 +23,7 @@ can_msg::MsgEncode lcd_headlights_msg( can_msg::BOOL, can_msg::AUX, can_msg::HEA
 
 //motor message defines
 can_msg::MsgEncode throttle_msg( can_msg::UINT16, can_msg::MOTOR, can_msg::THROTTLE, can_msg::CRITICAL, 1 );
-can_msg::MsgEncode brake_msg( can_msg::UINT16, can_msg::MOTOR, can_msg::BRAKE, can_msg::CRITICAL, 1 );
+//can_msg::MsgEncode brake_msg( can_msg::BOOL, can_msg::MOTOR, can_msg::BRAKE, can_msg::CRITICAL, 1 );
 can_msg::MsgEncode merror_msg( can_msg::BOOL, can_msg::MOTOR, can_msg::MERROR, can_msg::IMPORTANT, 2 );
 can_msg::MsgEncode mspeed_msg( can_msg::INT16, can_msg::MOTOR, can_msg::MSPEED, can_msg::INFORMATION, 1 );
 can_msg::MsgEncode mcurrent_msg( can_msg::INT16, can_msg::MOTOR, can_msg::MCURRENT, can_msg::INFORMATION, 1 );
@@ -62,47 +62,11 @@ can_msg::MsgEncode can_time_msg( can_msg::UINT8, can_msg::OTHER, can_msg::TIME, 
 
 
 
-
-
 //Starts can bus
 void Can::begin(void)
 {
     can_init(0,0,0,0,0,0,0,0);
 }
-
-//FUNCTIONS FOR SENDING VALUES OVER CAN BUS
-//void Can::send_throttle(uint16_t val) {
-//  // send throttle value
-//  throttle = val;
-//  CanMessage msg;
-//  msg.id = throttle_msg.id();
-//  msg.length = throttle_msg.len();
-//  throttle_msg.buf(msg.data, val);
-//  can_send_message(&msg);
-//}
-//void Can::send_brake(uint16_t val) {
-//  // send brake value
-//  brake = val;
-//  CanMessage msg;
-//  msg.id = brake_msg.id();
-//  msg.length = brake_msg.len();
-//  brake_msg.buf(msg.data, val);
-//  can_send_message(&msg);
-//}
-//
-//void Can::send_time(RTC_Time *now)
-//{
-//  CanMessage msg;
-//  msg.id = can_time_msg.id();
-//  msg.length = can_time_msg.len();
-//  msg.data[can_msg::YEAR] = now->year;
-//  msg.data[can_msg::MONTH] = now->month;
-//  msg.data[can_msg::DAY] = now->monthDay;
-//  msg.data[can_msg::HOUR] = now->hour;
-//  msg.data[can_msg::MINUTE] = now->minute;
-//  msg.data[can_msg::SECOND] = now->second;
-//  can_send_message(&msg);
-//}
 
 
 

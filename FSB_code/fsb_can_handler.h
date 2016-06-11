@@ -37,6 +37,28 @@ public:
   bool fc_purge_valve;
   bool fc_h2_valve;
   
+  void send_throttle(uint16_t val);
+  void send_brake(bool val);  
+  void send_time(RTC_Time *now);
+
+  //motor vars
+  uint16_t speed;
+  uint16_t throttle;
+  uint16_t mcurrent;
+
+  //fuel cell vars
+  int32_t FC_VOLT;
+  int32_t CAP_VOLT;
+  int32_t FC_TEMP;
+  uint16_t FC_ERROR;
+  uint8_t FC_PURGE_COUNT;
+
+  //aux/lcd
+  bool horn;
+  bool wipers;
+  bool headlights;
+  bool brake;
+
 };
 
 

@@ -13,6 +13,8 @@
 
 //Define CAN interrupt pin
 #define CAN_INIT 10
+#define CAN_INT 9
+
 
 
 //define status leds
@@ -23,6 +25,8 @@
 #define BRAKE_INPUT A2
 #define PEDAL_INPUT A3
 
+bool brake_value;
+
 
 ////////////////
 //    TIME    //
@@ -31,7 +35,7 @@ RTC_Time now; //variable for holding time
 #define TIME_WRITE_INTERVAL 250 //how often to send time over CAN bus
 uint32_t can_time_timer;
 
-#define PEDAL_DATA_WRITE_INTERVAL 1000 //how often to send pedal data over CAN bus
+#define PEDAL_DATA_WRITE_INTERVAL 200 //how often to send pedal data over CAN bus
 uint32_t pedal_send_timer;
 
 Can myCan;
@@ -44,21 +48,20 @@ void setup() {
   pinMode(PEDAL_INPUT,INPUT);
   pinMode(CAN_STATUS_LED,OUTPUT);
   pinMode(SD_STATUS_LED,OUTPUT);
-  
+
   //Start Serial for debugging
   Serial.begin(115200);
   delay(1000);
   
   //Start CAN bus communications
   myCan.begin();
-//
-  
+
   digitalWrite(CAN_STATUS_LED,HIGH);
 
-  
-  }
+}
 
 uint32_t time_var;
+
 #define comma Serial.print(',')
 #define NL Serial.print('\n');
 
