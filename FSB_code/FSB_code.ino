@@ -7,7 +7,6 @@
     //Possibly Reading Gas and Brake Pedals
 
 #include "fsb_can_handler.h"
-#include <rtc.h>
 #include <mcp2515_lib.h>
 #include <SPI.h>
 
@@ -25,34 +24,19 @@
 #define BRAKE_INPUT A2
 #define PEDAL_INPUT A3
 
-bool brake_value;
-
-
-////////////////
-//    TIME    //
-RTC_Time now; //variable for holding time
-
-#define TIME_WRITE_INTERVAL 250 //how often to send time over CAN bus
-uint32_t can_time_timer;
-
-#define PEDAL_DATA_WRITE_INTERVAL 200 //how often to send pedal data over CAN bus
-uint32_t pedal_send_timer;
 
 Can myCan;
 
-String filename;
 
 void setup() {
   //Set up pins
-  pinMode(BRAKE_INPUT,INPUT);
-  pinMode(PEDAL_INPUT,INPUT);
   pinMode(CAN_STATUS_LED,OUTPUT);
   pinMode(SD_STATUS_LED,OUTPUT);
 
   //Start Serial for debugging
   Serial.begin(115200);
-  delay(1000);
-  
+  delay(500);
+
   //Start CAN bus communications
   myCan.begin();
 
@@ -73,7 +57,6 @@ void loop() {
     myCan.read();
     digitalWrite(CAN_STATUS_LED,LOW);
   }
-
   if(millis() - time_var > 500)
   {
     Serial.print(myCan.fc_error);comma;
