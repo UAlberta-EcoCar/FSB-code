@@ -46,16 +46,15 @@ void setup() {
   pinMode(SD_STATUS_LED,OUTPUT);
   
   //Start Serial for debugging
-  Serial.begin(9600);
-  delay(100);
+  Serial.begin(115200);
+  delay(1000);
   
   //Start CAN bus communications
   myCan.begin();
-  Serial.println("CAN STARTED");
+//
   
   digitalWrite(CAN_STATUS_LED,HIGH);
 
-  delay(100);
   
   }
 
