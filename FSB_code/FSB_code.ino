@@ -1,32 +1,27 @@
 //Code for the Front Sensors Board
-//March 13, 2016
+//June 29, 2016
+
 //Functionality:
-    //Detecting "Heart beat" of other boards
-    //Logging Data to SD card
-    //Transmitting the time from RTC over CAN
-    //Possibly Reading Gas and Brake Pedals
+  //Reading Fuel Cell data off of can bus and sending over serial
+//To Do:
+  //read other values
+  //sd card
+  //rtc
+  //"heart beat monitoring
+  //Message filtering
 
 #include "fsb_can_handler.h"
 #include <mcp2515_lib.h>
 #include <SPI.h>
 
 //Define CAN interrupt pin
-#define CAN_INIT 10
 #define CAN_INT 9
-
-
 
 //define status leds
 #define CAN_STATUS_LED 3
 #define SD_STATUS_LED 2
 
-//define pedal input pins
-#define BRAKE_INPUT A2
-#define PEDAL_INPUT A3
-
-
 Can myCan;
-
 
 void setup() {
   //Set up pins
@@ -51,13 +46,13 @@ uint32_t time_var;
 
 void loop() { 
   
-  if(digitalRead(9) == 0)
+  if(digitalRead(CAN_INT) == 0)
   {
     digitalWrite(CAN_STATUS_LED,HIGH);
     myCan.read();
     digitalWrite(CAN_STATUS_LED,LOW);
   }
-  if(millis() - time_var > 500)
+  if(millis() - time_var > 1000)
   {
     Serial.print(myCan.fc_error);comma;
     Serial.print(myCan.fc_state);comma;
@@ -80,7 +75,7 @@ void loop() {
     Serial.print(myCan.fc_cap_relay);comma;
     Serial.print(myCan.fc_motor_relay);comma;
     Serial.print(myCan.fc_purge_valve);comma;
-    Serial.print(myCan.fc_h2_valve);NL;
+    Serial.print(myCan.fc_h2_valve);//NL;
 
     time_var = millis();
   }

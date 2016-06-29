@@ -1,4 +1,5 @@
-//this is going to be a massive file for recieving a ton for data off of can bus
+//Message defines for can bus messages
+//make sure it is the same as defines in other files
 #include <stdio.h>
 #include "can_message.h"
 #include "can_message_def.h"
@@ -8,18 +9,19 @@
 #include <mcp2515_filters.h>
 #include <rtc.h>
 
+/** Steering Wheel **/
+
 //LCD Horn
 can_msg::MsgEncode lcd_horn_msg( can_msg::BOOL, can_msg::AUX, can_msg::HORN, can_msg::IMPORTANT, 1);
-
 //LCD WIpers
 can_msg::MsgEncode lcd_wipers_msg( can_msg::BOOL, can_msg::AUX, can_msg::WIPERS, can_msg::IMPORTANT, 1);
-
 //LCD Signals
 can_msg::MsgEncode lcd_signals_msg( can_msg::BOOL, can_msg::AUX, can_msg::SIGNAL, can_msg::IMPORTANT, 3);
-
 //LCD Headlight
 can_msg::MsgEncode lcd_headlights_msg( can_msg::BOOL, can_msg::AUX, can_msg::HEADLIGHTS, can_msg::IMPORTANT, 1);
 
+
+/** Motor **/
 
 //motor message defines
 can_msg::MsgEncode throttle_msg( can_msg::UINT16, can_msg::MOTOR, can_msg::THROTTLE, can_msg::CRITICAL, 1 );
@@ -28,7 +30,9 @@ can_msg::MsgEncode merror_msg( can_msg::BOOL, can_msg::MOTOR, can_msg::MERROR, c
 can_msg::MsgEncode mspeed_msg( can_msg::INT16, can_msg::MOTOR, can_msg::MSPEED, can_msg::INFORMATION, 1 );
 can_msg::MsgEncode mcurrent_msg( can_msg::INT16, can_msg::MOTOR, can_msg::MCURRENT, can_msg::INFORMATION, 1 );
 
-//fuel cell message defines
+
+/** Fuel Cell **/
+
 //FC_ERROR
 can_msg::MsgEncode fc_error_msg( can_msg::UINT16, can_msg::FUEL_CELL, can_msg::FC_ERROR, can_msg::CRITICAL, 1 );
 //FC_STATE
@@ -56,10 +60,10 @@ can_msg::MsgEncode fc_fan_speed_msg( can_msg::INT32, can_msg::FUEL_CELL, can_msg
 //OUTPUTS
 can_msg::MsgEncode fc_outputs_msg( can_msg::BOOL, can_msg::FUEL_CELL, can_msg::FC_OUTPUTS, can_msg::INFORMATION, 6);
 
+/** OTHER **/
+
 //Time
 can_msg::MsgEncode can_time_msg( can_msg::UINT8, can_msg::OTHER, can_msg::TIME, can_msg::INFORMATION, 6);
-
-
 
 
 //Starts can bus
@@ -69,12 +73,12 @@ void Can::begin(void)
 }
 
 
-
 //FUNCTION FOR FILTERING THROUGH ALL THE MESSAGE ID's AND COLLECTING DATA
 void Can::read(void)
 {
   CanMessage message;
   message = can_get_message();
+ 
   //filter through message ID's
   if(message.id != 0)
   { 
