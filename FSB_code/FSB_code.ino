@@ -30,7 +30,7 @@ void setup() {
 
   //Start Serial for debugging
   Serial.begin(115200);
-  delay(500);
+  delay(1000);
 
   //Start CAN bus communications
   myCan.begin();
@@ -75,7 +75,7 @@ void loop() {
     Serial.print(myCan.fc_cap_relay);comma;
     Serial.print(myCan.fc_motor_relay);comma;
     Serial.print(myCan.fc_purge_valve);comma;
-    Serial.print(myCan.fc_h2_valve);//NL;
+    Serial.print(myCan.fc_h2_valve);
 
     time_var = millis();
   }
