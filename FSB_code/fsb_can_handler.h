@@ -10,7 +10,7 @@ class Can {
 public:
   Can() {};
   /** Start MCP2515 CHIP **/
-  void begin();
+  char begin();
 
   /** Read a message from MCP2515 chip **/
   void read();

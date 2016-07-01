@@ -13,30 +13,59 @@
 #include "fsb_can_handler.h"
 #include <mcp2515_lib.h>
 #include <SPI.h>
+#include <avr/interrupt.h>
+#include <avr/wdt.h>
+
 
 //Define CAN interrupt pin
 #define CAN_INT 9
 
 //define status leds
-#define CAN_STATUS_LED 3
-#define SD_STATUS_LED 2
+#define CAN_RXTX_LED 3
+#define CAN_STATUS_LED 2
 
 Can myCan;
+uint32_t can_reset_timer;
+
+/*
+ * Watchdog Timer Interrupt
+ */
+ISR(WDT_vect)
+{
+  if(check_overflow())
+  {
+    digitalWrite(CAN_STATUS_LED,HIGH);
+    fix_overflow_error();
+  }
+  else
+  {
+    digitalWrite(CAN_STATUS_LED,LOW);
+  }
+}
+
+void wdtSetup() {
+  cli();
+  MCUSR |= 0;
+  WDTCSR |= B00011000;
+  WDTCSR = B01000111;
+  sei();
+}
 
 void setup() {
   //Set up pins
+  pinMode(CAN_RXTX_LED,OUTPUT);
   pinMode(CAN_STATUS_LED,OUTPUT);
-  pinMode(SD_STATUS_LED,OUTPUT);
 
   //Start Serial for debugging
   Serial.begin(115200);
+  can_reset_timer = millis();
   delay(1000);
-
+  
   //Start CAN bus communications
   myCan.begin();
-
-  digitalWrite(CAN_STATUS_LED,HIGH);
-
+  can_reset_timer = millis();
+  digitalWrite(CAN_RXTX_LED,HIGH);
+  wdtSetup();
 }
 
 uint32_t time_var;
@@ -48,10 +77,12 @@ void loop() {
   
   if(digitalRead(CAN_INT) == 0)
   {
-    digitalWrite(CAN_STATUS_LED,HIGH);
+    digitalWrite(CAN_RXTX_LED,HIGH);
     myCan.read();
-    digitalWrite(CAN_STATUS_LED,LOW);
+    can_reset_timer = millis();
+    digitalWrite(CAN_RXTX_LED,LOW);
   }
+  
   if(millis() - time_var > 1000)
   {
     Serial.print(myCan.fc_error);comma;
@@ -75,7 +106,7 @@ void loop() {
     Serial.print(myCan.fc_cap_relay);comma;
     Serial.print(myCan.fc_motor_relay);comma;
     Serial.print(myCan.fc_purge_valve);comma;
-    Serial.print(myCan.fc_h2_valve);
+    Serial.print(myCan.fc_h2_valve);NL;
 
     time_var = millis();
   }

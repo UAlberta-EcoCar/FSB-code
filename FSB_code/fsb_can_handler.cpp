@@ -67,9 +67,9 @@ can_msg::MsgEncode can_time_msg( can_msg::UINT8, can_msg::OTHER, can_msg::TIME, 
 
 
 //Starts can bus
-void Can::begin(void)
+char Can::begin(void)
 {
-    can_init(0,0,0,0,0,0,0,0);
+    return(can_init(0,0,0,0,0,0,0,0));
 }
 
 
