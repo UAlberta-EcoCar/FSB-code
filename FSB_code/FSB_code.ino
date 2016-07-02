@@ -63,9 +63,9 @@ void setup() {
   
   //Start CAN bus communications
   myCan.begin();
-  can_reset_timer = millis();
+  //can_reset_timer = millis();
   digitalWrite(CAN_RXTX_LED,HIGH);
-  wdtSetup();
+  //wdtSetup();
 }
 
 uint32_t time_var;
